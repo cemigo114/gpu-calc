@@ -1176,6 +1176,60 @@ tr.selected td{background:rgba(37,99,235,.04)}
         </div>
       </div>
 
+      <!-- AGENTIC WORKLOAD DRAWER -->
+      <div class="drawer">
+        <div class="dhd" onclick="toggleD('agentic')">
+          <div>
+            <div class="dt">Agentic workload profile</div>
+            <div class="ds">Tool calls &middot; Turns &middot; Context growth</div>
+          </div>
+          <span class="da" id="da-agentic">&#9660;</span>
+        </div>
+        <div class="dbd" id="dbd-agentic">
+          <div class="dsec">
+            <div class="dstitle">Enable Agentic Model</div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+              <div class="tw" onclick="toggleAgentic()">
+                <div class="tt" id="agentic-toggle"><div class="th"></div></div>
+                <span class="tlbl">Model agentic workload patterns</span>
+              </div>
+            </div>
+            <div style="font-size:10px;color:var(--text3);font-family:var(--mono);line-height:1.5;margin-bottom:6px">
+              Models multi-turn agentic sessions (Claude Code, Cursor, etc.).<br>
+              Context grows each turn as tool outputs accumulate.
+            </div>
+          </div>
+          <div class="dsec" id="agentic-inputs" style="display:none">
+            <div class="dstitle">Session Shape</div>
+            <div class="aprow">
+              <label>Turns per session</label>
+              <input type="range" min="1" max="50" step="1" id="s-ag-turns" value="10" oninput="agTurns(+this.value)">
+              <span class="apval" id="v-ag-turns">10</span>
+            </div>
+            <div class="aprow">
+              <label>Tool calls per turn</label>
+              <input type="range" min="0" max="20" step="1" id="s-ag-tools" value="5" oninput="agTools(+this.value)">
+              <span class="apval" id="v-ag-tools">5</span>
+            </div>
+            <div class="aprow">
+              <label>System prompt (tokens)</label>
+              <input type="range" min="1000" max="20000" step="500" id="s-ag-sys" value="5000" oninput="agSys(+this.value)">
+              <span class="apval" id="v-ag-sys">5.0K</span>
+            </div>
+            <div class="aprow">
+              <label>Context growth/turn (tokens)</label>
+              <input type="range" min="500" max="10000" step="500" id="s-ag-growth" value="2000" oninput="agGrowth(+this.value)">
+              <span class="apval" id="v-ag-growth">2.0K</span>
+            </div>
+            <div class="aprow">
+              <label>Avg output/turn (tokens)</label>
+              <input type="range" min="100" max="5000" step="100" id="s-ag-out" value="1000" oninput="agOut(+this.value)">
+              <span class="apval" id="v-ag-out">1.0K</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div><!-- /left-panel -->
 
     <!-- RIGHT: RESULTS (all DOM elements, JS just updates text/style) -->
@@ -1276,6 +1330,9 @@ tr.selected td{background:rgba(37,99,235,.04)}
 
         <!-- API COST COMPARISON -->
         <div id="api-compare-wrap" style="display:none"></div>
+
+        <!-- AGENTIC WORKLOAD PROFILE -->
+        <div id="agentic-profile-wrap" style="display:none"></div>
 
         <!-- OPTIMISATION TIERS -->
         <div class="tlist" id="tier-list"></div>
@@ -1690,7 +1747,8 @@ var S = {
   onpremYr:25000, awsHr:3.10, amortYrs:5, cloudHike:3,
   apiEnabled:false, apiModel:'claude-opus-4-8', apiInputPrice:5.00, apiOutputPrice:25.00,
   apiBatch:false, apiCacheRate:0, apiVolume:1000000, apiAvgInput:15000, apiAvgOutput:2000,
-  throughput:200
+  throughput:200,
+  agEnabled:false, agTurns:10, agTools:5, agSysPrompt:5000, agGrowth:2000, agOutput:1000
 };
 var ADMIN = {cost:true, tech:true, onprem:true, aws:true};
 var isDark = false;
@@ -2381,6 +2439,9 @@ function _renderResult() {
   // API comparison
   renderApiComparison(r.t4 < r.t1 && r.llmdOk ? r.t4 : r.t1);
 
+  // Agentic workload profile
+  renderAgenticProfile();
+
   // Tiers
   var tl = el('tier-list');
   tl.innerHTML = '';
@@ -2779,6 +2840,79 @@ function renderApiComparison(gpuCount) {
     + (S.apiCacheRate > 0 ? ', ' + S.apiCacheRate + '% prompt cache hit rate' : '')
     + '. Workload: ' + (S.apiVolume>=1e6?(S.apiVolume/1e6).toFixed(1)+'M':Math.round(S.apiVolume/1000)+'K') + ' req/mo'
     + ', ' + Math.round(S.apiAvgInput/1000) + 'K in / ' + (S.apiAvgOutput/1000).toFixed(1) + 'K out per request.'
+    + '\x3c/div>'
+    + '\x3c/div>';
+}
+
+// ===== AGENTIC WORKLOAD =====
+function toggleAgentic() {
+  S.agEnabled = !S.agEnabled;
+  el('agentic-toggle').classList.toggle('on', S.agEnabled);
+  el('agentic-inputs').style.display = S.agEnabled ? '' : 'none';
+  renderResult();
+}
+function agTurns(v) { S.agTurns=v; el('v-ag-turns').textContent=v; renderResult(); }
+function agTools(v) { S.agTools=v; el('v-ag-tools').textContent=v; renderResult(); }
+function agSys(v) { S.agSysPrompt=v; el('v-ag-sys').textContent=(v/1000).toFixed(1)+'K'; renderResult(); }
+function agGrowth(v) { S.agGrowth=v; el('v-ag-growth').textContent=(v/1000).toFixed(1)+'K'; renderResult(); }
+function agOut(v) { S.agOutput=v; el('v-ag-out').textContent=(v/1000).toFixed(1)+'K'; renderResult(); }
+
+function calcAgenticProfile() {
+  var turns = S.agTurns;
+  var sysTokens = S.agSysPrompt;
+  var growthPerTurn = S.agGrowth;
+  var outputPerTurn = S.agOutput;
+  var toolsPerTurn = S.agTools;
+
+  var totalInput = 0, totalOutput = 0, peakCtx = 0;
+  for (var t = 0; t < turns; t++) {
+    var turnCtx = sysTokens + t * growthPerTurn;
+    totalInput += turnCtx;
+    totalOutput += outputPerTurn;
+    if (turnCtx > peakCtx) peakCtx = turnCtx;
+  }
+
+  var totalTokens = totalInput + totalOutput;
+  var avgInputPerTurn = Math.round(totalInput / turns);
+  var cacheBenefit = sysTokens / (avgInputPerTurn || 1);
+
+  return {
+    turns: turns,
+    toolsPerTurn: toolsPerTurn,
+    totalToolCalls: turns * toolsPerTurn,
+    totalInput: totalInput,
+    totalOutput: totalOutput,
+    totalTokens: totalTokens,
+    peakCtxK: Math.round(peakCtx / 1000),
+    avgInputPerTurn: avgInputPerTurn,
+    cacheBenefit: Math.round(cacheBenefit * 100),
+    sysTokens: sysTokens
+  };
+}
+
+function renderAgenticProfile() {
+  var wrap = el('agentic-profile-wrap');
+  if (!S.agEnabled) { wrap.style.display='none'; return; }
+  wrap.style.display='';
+  var a = calcAgenticProfile();
+
+  wrap.innerHTML = '\x3cdiv class="api-card">'
+    + '\x3cdiv style="font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:.07em;margin-bottom:12px;text-transform:uppercase">AGENTIC SESSION PROFILE\x3c/div>'
+    + '\x3cdiv class="kvm" style="margin-bottom:12px">'
+    + '\x3cdiv class="kvc">\x3cdiv class="kvlbl">TURNS\x3c/div>\x3cdiv class="kvval">' + a.turns + '\x3c/div>'
+    + '\x3cdiv class="kvsub">' + a.toolsPerTurn + ' tool calls/turn\x3c/div>\x3c/div>'
+    + '\x3cdiv class="kvc">\x3cdiv class="kvlbl">PEAK CONTEXT\x3c/div>\x3cdiv class="kvval">' + a.peakCtxK + 'K\x3c/div>'
+    + '\x3cdiv class="kvsub">tokens at final turn\x3c/div>\x3c/div>'
+    + '\x3cdiv class="kvc">\x3cdiv class="kvlbl">TOTAL TOKENS\x3c/div>\x3cdiv class="kvval">' + (a.totalTokens>=1e6?(a.totalTokens/1e6).toFixed(1)+'M':Math.round(a.totalTokens/1000)+'K') + '\x3c/div>'
+    + '\x3cdiv class="kvsub">' + Math.round(a.totalInput/1000) + 'K in / ' + Math.round(a.totalOutput/1000) + 'K out\x3c/div>\x3c/div>'
+    + '\x3cdiv class="kvc">\x3cdiv class="kvlbl">CACHE BENEFIT\x3c/div>\x3cdiv class="kvval">' + a.cacheBenefit + '%\x3c/div>'
+    + '\x3cdiv class="kvsub">system prompt reuse\x3c/div>\x3c/div>'
+    + '\x3c/div>'
+    + '\x3cdiv class="api-note">'
+    + 'Session: ' + a.turns + ' turns &times; ' + a.toolsPerTurn + ' tool calls = ' + a.totalToolCalls + ' total tool calls. '
+    + 'System prompt (' + (a.sysTokens/1000).toFixed(1) + 'K tokens) cached across turns. '
+    + 'Context grows ' + (S.agGrowth/1000).toFixed(1) + 'K tokens/turn from tool outputs. '
+    + 'Peak context at turn ' + a.turns + ': ' + a.peakCtxK + 'K tokens.'
     + '\x3c/div>'
     + '\x3c/div>';
 }

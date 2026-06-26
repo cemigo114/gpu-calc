@@ -66,6 +66,7 @@ function test(name, fn) {
   S.apiEnabled=false; S.apiModel='claude-opus-4-8'; S.apiInputPrice=5.00; S.apiOutputPrice=25.00;
   S.apiBatch=false; S.apiCacheRate=0; S.apiVolume=1000000; S.apiAvgInput=15000; S.apiAvgOutput=2000;
   S.throughput=200;
+  S.agEnabled=false; S.agTurns=10; S.agTools=5; S.agSysPrompt=5000; S.agGrowth=2000; S.agOutput=1000;
   try {
     fn();
     passed++;
@@ -702,6 +703,45 @@ test('calcApiComparison: self-hosted cheaper at high volume', function() {
   var a = calcApiComparison(8);
   assert(a.savingsTotal > 0, 'Self-hosted should be cheaper at 5M req/mo');
   assert(a.savingsPct > 0, 'Savings pct should be positive');
+});
+
+// ── SECTION: AGENTIC WORKLOAD ────────────────────────────────────────────────
+section('Agentic Workload Profile');
+
+test('calcAgenticProfile: basic session math', function() {
+  S.agEnabled=true; S.agTurns=10; S.agTools=5;
+  S.agSysPrompt=5000; S.agGrowth=2000; S.agOutput=1000;
+  var a = calcAgenticProfile();
+  assertEq(a.turns, 10, 'turns');
+  assertEq(a.totalToolCalls, 50, 'total tool calls = 10*5');
+  assertEq(a.totalOutput, 10000, 'total output = 10*1000');
+  assert(a.peakCtxK > 0, 'peak context should be positive');
+});
+
+test('calcAgenticProfile: peak context grows with turns', function() {
+  S.agEnabled=true; S.agSysPrompt=5000; S.agGrowth=2000;
+  S.agTurns=5; S.agOutput=1000; S.agTools=3;
+  var a5 = calcAgenticProfile();
+  S.agTurns=20;
+  var a20 = calcAgenticProfile();
+  assert(a20.peakCtxK > a5.peakCtxK, 'more turns = higher peak context');
+  assert(a20.totalTokens > a5.totalTokens, 'more turns = more total tokens');
+});
+
+test('calcAgenticProfile: cache benefit from system prompt', function() {
+  S.agEnabled=true; S.agTurns=10; S.agTools=5;
+  S.agSysPrompt=10000; S.agGrowth=1000; S.agOutput=500;
+  var a = calcAgenticProfile();
+  assert(a.cacheBenefit > 50, 'high system prompt relative to growth = high cache benefit (' + a.cacheBenefit + '%)');
+});
+
+test('calcAgenticProfile: single turn is valid', function() {
+  S.agEnabled=true; S.agTurns=1; S.agTools=0;
+  S.agSysPrompt=5000; S.agGrowth=0; S.agOutput=500;
+  var a = calcAgenticProfile();
+  assertEq(a.totalInput, 5000, 'single turn input = system prompt');
+  assertEq(a.totalOutput, 500, 'single turn output');
+  assertEq(a.peakCtxK, 5, 'peak = 5K');
 });
 
 // ── SUMMARY ───────────────────────────────────────────────────────────────────
