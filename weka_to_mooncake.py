@@ -51,7 +51,12 @@ def convert_session(
 
     converted = []
     for req in requests:
+        if req.get("type") not in ("s", "n"):
+            continue
+
         input_tokens = req.get("in", 0)
+        if input_tokens == 0:
+            continue
         if input_tokens > max_input_tokens:
             input_tokens = max_input_tokens
 
