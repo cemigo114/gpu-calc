@@ -227,6 +227,23 @@ html.dark .cchead.op{background:rgba(62,207,142,.07)}.html.dark .cchead.aw{backg
 html.dark .svbadge.op{background:rgba(62,207,142,.1);border-color:rgba(62,207,142,.2)}
 html.dark .svbadge.aw{border-color:rgba(247,169,79,.2)}
 
+/* API COMPARISON */
+.api-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px 18px}
+.api-vs{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center}
+.api-side{text-align:center;padding:12px}
+.api-side .api-price{font-family:var(--display);font-size:24px;font-weight:700;line-height:1}
+.api-side .api-sub{font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:4px}
+.api-side.self{border:1px solid rgba(21,128,61,.2);border-radius:10px;background:rgba(21,128,61,.04)}
+.api-side.self .api-price{color:var(--green)}
+.api-side.cloud{border:1px solid rgba(146,64,14,.2);border-radius:10px;background:rgba(146,64,14,.04)}
+.api-side.cloud .api-price{color:var(--amber)}
+.api-divider{font-family:var(--display);font-size:16px;font-weight:600;color:var(--text3)}
+.api-savings{text-align:center;margin-top:12px;padding:8px 12px;background:var(--gdim);border:1px solid rgba(21,128,61,.18);border-radius:8px}
+.api-savings .api-sval{font-family:var(--display);font-size:18px;font-weight:700;color:var(--green)}
+.api-savings .api-slbl{font-family:var(--mono);font-size:10px;color:var(--green);margin-top:2px}
+.api-note{font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:8px;line-height:1.5}
+.api-sov{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;background:rgba(37,99,235,.08);border:1px solid rgba(37,99,235,.2);border-radius:14px;font-family:var(--mono);font-size:10px;color:var(--blue);margin-top:8px}
+
 /* TIERS */
 .tlist{display:flex;flex-direction:column;gap:5px}
 .trow{display:flex;align-items:flex-start;gap:9px;padding:10px 12px;
@@ -592,19 +609,6 @@ tr.selected td{background:rgba(37,99,235,.04)}
 <nav class="nav">
   <div style="display:flex;align-items:center;gap:10px">
     <div class="brand" style="cursor:pointer" onclick="toggleAbout()">gpu<span>.</span>calc</div>
-    <div style="display:flex;align-items:center;gap:7px;padding-left:10px;border-left:1px solid var(--border)">
-      <a href="https://www.linkedin.com/in/vgrover1515/" target="_blank" rel="noopener"
-         title="Vikas Grover on LinkedIn"
-         style="font-family:var(--mono);font-size:11px;color:var(--text3);text-decoration:none;transition:color .15s;display:flex;align-items:center;gap:4px"
-         onmouseover="this.style.color='var(--blue)'" onmouseout="this.style.color='var(--text3)'">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" style="opacity:.6"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-        vgrover1515
-      </a>
-      <a href="https://huggingface.co/vikasgrover2004" target="_blank" rel="noopener"
-         title="Vikas Grover on HuggingFace"
-         style="font-size:13px;text-decoration:none;opacity:.55;transition:opacity .15s"
-         onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.55'">&#129303;</a>
-    </div>
   </div>
   <div class="ntabs">
     <button class="ntab on" onclick="switchPage('home',this)">Home</button>
@@ -621,7 +625,6 @@ tr.selected td{background:rgba(37,99,235,.04)}
       <div class="tw" onclick="tog('tech')"><div class="tt on" id="t-tech"><div class="th"></div></div><span class="tlbl">Tech</span></div>
       <div class="tw" onclick="tog('onprem')"><div class="tt on" id="t-onprem"><div class="th"></div></div><span class="tlbl">On-prem</span></div>
       <div class="tw" onclick="tog('aws')"><div class="tt on" id="t-aws"><div class="th"></div></div><span class="tlbl">AWS</span></div>
-      <div class="tw" onclick="tog('linkedin')"><div class="tt on" id="t-linkedin"><div class="th"></div></div><span class="tlbl">LinkedIn</span></div>
     </div>
   </div>
 </nav>
@@ -668,25 +671,9 @@ tr.selected td{background:rgba(37,99,235,.04)}
     <p style="font-size:14px;color:var(--text2);line-height:1.8;margin-bottom:20px">
       I built this so I don't have to explain it from scratch every time &mdash; and so the people asking can see the reasoning, not just the number.
     </p>
-    <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
-      <div style="display:flex;align-items:center;gap:10px">
-        <div style="width:36px;height:36px;border-radius:50%;background:var(--bdim);border:1.5px solid var(--bbord);display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:13px;font-weight:700;color:var(--blue);flex-shrink:0">VG</div>
-        <div>
-          <div style="font-size:13px;font-weight:600;color:var(--text);font-family:var(--display)">Vikas Grover</div>
-          <div style="font-family:var(--mono);font-size:10px;color:var(--text3)">AI Infrastructure &middot; LLM Inference</div>
-        </div>
-      </div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <a href="https://www.linkedin.com/in/vgrover1515/" target="_blank" rel="noopener"
-           style="display:inline-flex;align-items:center;gap:5px;padding:6px 12px;background:#0a66c2;color:#fff;border-radius:6px;text-decoration:none;font-size:11px;font-weight:500">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-          Connect
-        </a>
-        <a href="https://huggingface.co/vikasgrover2004" target="_blank" rel="noopener"
-           style="display:inline-flex;align-items:center;gap:5px;padding:6px 12px;background:var(--bg3);border:1px solid var(--border2);color:var(--text2);border-radius:6px;text-decoration:none;font-size:11px">
-          &#129303; HuggingFace
-        </a>
-
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text3)">
+        Based on <a href="https://github.com/cemigo114/gpu-calc" target="_blank" style="color:var(--blue)">gpu-calc</a> &middot; Extended with GLM 5.2, MLA, and API cost comparison
       </div>
     </div>
 
@@ -737,10 +724,6 @@ tr.selected td{background:rgba(37,99,235,.04)}
 
       </div>
     </div>
-    <div style="margin-top:24px;font-family:var(--mono);font-size:10px;color:var(--text3);line-height:1.7">
-      Sizing infrastructure, evaluating cloud vs on-prem, or just want to understand the math? &mdash;
-      <a href="https://www.linkedin.com/in/vgrover1515/" target="_blank" rel="noopener" style="color:var(--blue)">let&rsquo;s talk</a>
-    </div>
   </div>
 </div>
 </div>
@@ -763,6 +746,7 @@ tr.selected td{background:rgba(37,99,235,.04)}
       <button class="wiz-opt" onclick="wizPickModel(32,'~32B',this)"><span>~32B parameters</span><span class="wiz-opt-sub">Qwen2.5 32B &middot; QwQ-32B</span></button>
       <button class="wiz-opt" onclick="wizPickModel(70,'~70B',this)"><span>~70B parameters</span><span class="wiz-opt-sub">Llama 3.1 70B &middot; Qwen 72B &middot; Nemotron 70B</span></button>
       <button class="wiz-opt" onclick="wizPickModel(405,'405B',this)"><span>405B parameters</span><span class="wiz-opt-sub">Llama 3.1 405B</span></button>
+      <button class="wiz-opt" onclick="wizPickModel(744,'744B MoE',this)" style="border:1px solid var(--bbord)"><span>744B MoE (GLM 5.2)</span><span class="wiz-opt-sub">z.ai GLM 5.2 &middot; 40B active &middot; MLA compressed KV</span></button>
     </div>
     <div class="wiz-nav"><button class="wiz-next" onclick="wizNext()">Next &rarr;</button></div>
   </div>
@@ -939,6 +923,7 @@ tr.selected td{background:rgba(37,99,235,.04)}
           <div class="qchip" onclick="qm('RedHatAI/Llama-3.1-8B-Instruct-quantized.w8a8')">RH Llama 8B W8A8</div>
           <div class="qchip" onclick="qm('RedHatAI/Llama-3.1-70B-Instruct-quantized.w8a8')">RH Llama 70B W8A8</div>
           <div class="qchip" onclick="qm('nvidia/Llama-3.1-Nemotron-70B-Instruct-HF')">Nemotron 70B</div>
+          <div class="qchip" onclick="qm('zai-org/GLM-5.2-FP8')" style="border-color:var(--bbord);color:var(--blue)">GLM 5.2 FP8</div>
         </div>
         <div class="minfo" id="minfo"></div>
         <div class="hfst" id="hf-st"></div>
@@ -1116,6 +1101,135 @@ tr.selected td{background:rgba(37,99,235,.04)}
         </div>
       </div>
 
+      <!-- API COMPARISON DRAWER -->
+      <div class="drawer">
+        <div class="dhd" onclick="toggleD('api')">
+          <div>
+            <div class="dt">API cost comparison</div>
+            <div class="ds">Compare self-hosted vs Claude API pricing</div>
+          </div>
+          <span class="da" id="da-api">&#9660;</span>
+        </div>
+        <div class="dbd" id="dbd-api">
+          <div class="dsec">
+            <div class="dstitle">Enable Comparison</div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+              <div class="tw" onclick="toggleApi()">
+                <div class="tt" id="api-toggle"><div class="th"></div></div>
+                <span class="tlbl">Show API cost comparison</span>
+              </div>
+            </div>
+          </div>
+          <div class="dsec" id="api-inputs" style="display:none">
+            <div class="dstitle">API Model &amp; Pricing</div>
+            <div class="clbl">API model</div>
+            <div class="chips" id="api-model-chips">
+              <div class="chip on" data-v="claude-opus-4-8" onclick="apiModel('claude-opus-4-8',this)">Claude Opus 4.8</div>
+              <div class="chip" data-v="claude-sonnet-4-6" onclick="apiModel('claude-sonnet-4-6',this)">Claude Sonnet 4.6</div>
+              <div class="chip" data-v="claude-haiku-4-5" onclick="apiModel('claude-haiku-4-5',this)">Claude Haiku 4.5</div>
+            </div>
+            <div class="aprow" style="margin-top:8px">
+              <label>Input price ($/M tokens)</label>
+              <input type="range" min="0.5" max="15" step="0.5" id="s-api-in" value="5.00" oninput="apiIn(+this.value)">
+              <span class="apval" id="v-api-in">$5.00</span>
+            </div>
+            <div class="aprow">
+              <label>Output price ($/M tokens)</label>
+              <input type="range" min="1" max="75" step="1" id="s-api-out" value="25" oninput="apiOut(+this.value)">
+              <span class="apval" id="v-api-out">$25.00</span>
+            </div>
+            <div style="display:flex;gap:8px;margin-bottom:8px;align-items:center">
+              <div class="tw" onclick="toggleApiBatch()">
+                <div class="tt" id="api-batch-toggle"><div class="th"></div></div>
+                <span class="tlbl">Batch API (50% discount, async)</span>
+              </div>
+            </div>
+            <div class="aprow">
+              <label>Prompt cache hit rate</label>
+              <input type="range" min="0" max="90" step="5" id="s-api-cache" value="0" oninput="apiCache(+this.value)">
+              <span class="apval" id="v-api-cache">0%</span>
+            </div>
+          </div>
+          <div class="dsec" id="api-workload" style="display:none">
+            <div class="dstitle">Workload</div>
+            <div class="aprow">
+              <label>Monthly requests</label>
+              <input type="range" min="10000" max="10000000" step="10000" id="s-api-vol" value="1000000" oninput="apiVol(+this.value)">
+              <span class="apval" id="v-api-vol">1.0M</span>
+            </div>
+            <div class="aprow">
+              <label>Avg input tokens/request</label>
+              <input type="range" min="500" max="100000" step="500" id="s-api-avgin" value="15000" oninput="apiAvgIn(+this.value)">
+              <span class="apval" id="v-api-avgin">15K</span>
+            </div>
+            <div class="aprow">
+              <label>Avg output tokens/request</label>
+              <input type="range" min="100" max="20000" step="100" id="s-api-avgout" value="2000" oninput="apiAvgOut(+this.value)">
+              <span class="apval" id="v-api-avgout">2.0K</span>
+            </div>
+            <div class="aprow">
+              <label>Self-hosted throughput<br><span style="font-size:10px">tokens/sec per TP group</span></label>
+              <input type="range" min="50" max="500" step="10" id="s-tput" value="200" oninput="apiTput(+this.value)">
+              <span class="apval" id="v-tput">200 tok/s</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AGENTIC WORKLOAD DRAWER -->
+      <div class="drawer">
+        <div class="dhd" onclick="toggleD('agentic')">
+          <div>
+            <div class="dt">Agentic workload profile</div>
+            <div class="ds">Tool calls &middot; Turns &middot; Context growth</div>
+          </div>
+          <span class="da" id="da-agentic">&#9660;</span>
+        </div>
+        <div class="dbd" id="dbd-agentic">
+          <div class="dsec">
+            <div class="dstitle">Enable Agentic Model</div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+              <div class="tw" onclick="toggleAgentic()">
+                <div class="tt" id="agentic-toggle"><div class="th"></div></div>
+                <span class="tlbl">Model agentic workload patterns</span>
+              </div>
+            </div>
+            <div style="font-size:10px;color:var(--text3);font-family:var(--mono);line-height:1.5;margin-bottom:6px">
+              Models multi-turn agentic sessions (Claude Code, Cursor, etc.).<br>
+              Context grows each turn as tool outputs accumulate.
+            </div>
+          </div>
+          <div class="dsec" id="agentic-inputs" style="display:none">
+            <div class="dstitle">Session Shape</div>
+            <div class="aprow">
+              <label>Turns per session</label>
+              <input type="range" min="1" max="50" step="1" id="s-ag-turns" value="10" oninput="agTurns(+this.value)">
+              <span class="apval" id="v-ag-turns">10</span>
+            </div>
+            <div class="aprow">
+              <label>Tool calls per turn</label>
+              <input type="range" min="0" max="20" step="1" id="s-ag-tools" value="5" oninput="agTools(+this.value)">
+              <span class="apval" id="v-ag-tools">5</span>
+            </div>
+            <div class="aprow">
+              <label>System prompt (tokens)</label>
+              <input type="range" min="1000" max="20000" step="500" id="s-ag-sys" value="5000" oninput="agSys(+this.value)">
+              <span class="apval" id="v-ag-sys">5.0K</span>
+            </div>
+            <div class="aprow">
+              <label>Context growth/turn (tokens)</label>
+              <input type="range" min="500" max="10000" step="500" id="s-ag-growth" value="2000" oninput="agGrowth(+this.value)">
+              <span class="apval" id="v-ag-growth">2.0K</span>
+            </div>
+            <div class="aprow">
+              <label>Avg output/turn (tokens)</label>
+              <input type="range" min="100" max="5000" step="100" id="s-ag-out" value="1000" oninput="agOut(+this.value)">
+              <span class="apval" id="v-ag-out">1.0K</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div><!-- /left-panel -->
 
     <!-- RIGHT: RESULTS (all DOM elements, JS just updates text/style) -->
@@ -1213,6 +1327,12 @@ tr.selected td{background:rgba(37,99,235,.04)}
 
         <!-- COST COMPARISON -->
         <div id="cost-wrap"></div>
+
+        <!-- API COST COMPARISON -->
+        <div id="api-compare-wrap" style="display:none"></div>
+
+        <!-- AGENTIC WORKLOAD PROFILE -->
+        <div id="agentic-profile-wrap" style="display:none"></div>
 
         <!-- OPTIMISATION TIERS -->
         <div class="tlist" id="tier-list"></div>
@@ -1595,16 +1715,7 @@ tr.selected td{background:rgba(37,99,235,.04)}
       </p>
     </div>
     <div style="display:flex;flex-direction:column;gap:8px;flex-shrink:0">
-      <a href="https://www.linkedin.com/in/vgrover1515/" target="_blank" rel="noopener"
-         style="display:flex;align-items:center;gap:8px;padding:9px 16px;background:#0a66c2;color:#fff;border-radius:8px;text-decoration:none;font-size:12px;font-weight:500">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-        Connect on LinkedIn
-      </a>
-      <a href="https://huggingface.co/vikasgrover2004" target="_blank" rel="noopener"
-         style="display:flex;align-items:center;gap:8px;padding:9px 16px;background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:8px;text-decoration:none;font-size:12px">
-        &#129303; HuggingFace profile
-      </a>
-      <a href="https://github.com/nb-qbits/gpu-calc" target="_blank" rel="noopener"
+      <a href="https://github.com/cemigo114/gpu-calc" target="_blank" rel="noopener"
          style="display:flex;align-items:center;gap:8px;padding:9px 16px;background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:8px;text-decoration:none;font-size:12px">
         &#128196; View source on GitHub
       </a>
@@ -1614,46 +1725,13 @@ tr.selected td{background:rgba(37,99,235,.04)}
 </div>
 
 
-<!-- LINKEDIN -->
-<div class="liwrap" id="liwrap">
-  <div class="licard">
-    <button class="lidis" onclick="disLI()">&#215;</button>
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
-      <div class="liav" style="width:40px;height:40px;border-radius:50%;background:var(--bdim);border:2px solid var(--bbord);display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:15px;font-weight:800;color:var(--blue);flex-shrink:0">VG</div>
-      <div>
-        <div style="font-size:13px;font-weight:600;color:var(--text);font-family:var(--display)">Vikas Grover</div>
-        <div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:1px">AI Infrastructure &middot; LLM Inference</div>
-      </div>
-    </div>
-    <div style="font-size:11px;color:var(--text2);line-height:1.6;margin-bottom:10px">Building open-source AI infra tooling. Follow for LLM inference, GPU sizing, and platform engineering content.</div>
-    <a class="libtn" href="https://www.linkedin.com/in/vgrover1515/" target="_blank" rel="noopener">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-      </svg>
-      Connect on LinkedIn
-    </a>
-  </div>
-</div>
-
-<!-- COUNTER BAR -->
+<div class="liwrap h" id="liwrap"></div>
 <div class="cbar">
-  <div class="citems">
-    <div class="ci"><div class="cdot"></div><span>Visitors</span><span class="cnum" id="visit-count">—</span></div>
-    <div class="ci"><span>Today</span><span class="cnum" id="today-count">—</span></div>
-    <div class="ci" id="geo-item" style="display:none">
-      <span>Top:</span><div class="gcs2" id="geo-chips"></div>
-    </div>
-  </div>
+  <div class="citems"></div>
   <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-    <span style="font-family:var(--mono);font-size:10px;color:var(--text3)">real-time inference &middot; v5.9</span>
-    <a href="https://github.com/nb-qbits/gpu-calc" target="_blank"
+    <span style="font-family:var(--mono);font-size:10px;color:var(--text3)">gpu.calc &middot; GLM 5.2 TCO edition</span>
+    <a href="https://github.com/cemigo114/gpu-calc" target="_blank"
       style="font-family:var(--mono);font-size:10px;color:var(--text3);text-decoration:none">&#9733; GitHub</a>
-    <span style="font-family:var(--mono);font-size:10px;color:var(--text3)">
-      &#169; 2025 &middot; <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" style="color:var(--text3)">CC BY-NC 4.0</a>
-      &nbsp;&middot;&nbsp;
-      Sizing infrastructure or just curious?
-      <a href="https://www.linkedin.com/in/vgrover1515/" target="_blank" rel="noopener" style="color:var(--blue)">Let&#39;s talk &rarr;</a>
-    </span>
   </div>
 </div>
 
@@ -1663,25 +1741,27 @@ tr.selected td{background:rgba(37,99,235,.04)}
 var S = {
   model:8, modelLabel:'8B',
   numKvHeads:null, headDim:null, numLayers:null, hfId:null,
+  mla:false, kvLoraRank:null, qkRopeDim:null,
   users:30, gpu:80, gpuName:'H100', ctx:8,
   wp:2, kv:2, kvLabel:'fp16', attn:'gqa', hitrate:0.1, overhead:8,
-  onpremYr:25000, awsHr:3.10, amortYrs:5, cloudHike:3
+  onpremYr:25000, awsHr:3.10, amortYrs:5, cloudHike:3,
+  apiEnabled:false, apiModel:'claude-opus-4-8', apiInputPrice:5.00, apiOutputPrice:25.00,
+  apiBatch:false, apiCacheRate:0, apiVolume:1000000, apiAvgInput:15000, apiAvgOutput:2000,
+  throughput:200,
+  agEnabled:false, agTurns:10, agTools:5, agSysPrompt:5000, agGrowth:2000, agOutput:1000
 };
-var ADMIN = {cost:true, tech:true, onprem:true, aws:true, linkedin:true};
+var ADMIN = {cost:true, tech:true, onprem:true, aws:true};
 var isDark = false;
 var chartInst = null, scatterInst = null;
 var axX='vram', axY='tpp', axR='price';
 var showNv=true, showAmd=true, pShowNv=true, pShowAmd=true, pShowCloud=true;
 var sortKey=null, sortDir=1, liDismissed=false;
-var PROFILE = {
-  ns:'nb-qbits', key:'gpu-calc-visits',
-  today:'gpu-calc-today-'+new Date().toISOString().slice(0,10).replace(/-/g,'')
-};
+var PROFILE = {ns:'', key:'', today:''};
 
 // ===== HF API =====
 // ===== CLOUDFLARE WORKER URL =====
 // After deploying hf-proxy-worker.js, replace this with your worker URL:
-var HF_PROXY = 'https://billowing-scene-eb2c.vikasgrover2004.workers.dev';
+var HF_PROXY = '';
 var MODEL_CONFIGS = {
   'meta-llama/Llama-3.1-8B':   {params:8,  layers:32, kvHeads:8,  headDim:128, dtype:'bfloat16', maxCtx:131072, attn:'gqa'},
   'meta-llama/Llama-3.1-8B-Instruct': {params:8, layers:32, kvHeads:8, headDim:128, dtype:'bfloat16', maxCtx:131072, attn:'gqa'},
@@ -1724,12 +1804,16 @@ var MODEL_CONFIGS = {
   // NVIDIA
   'nvidia/Llama-3.1-Nemotron-70B-Instruct-HF':{params:70,layers:80,kvHeads:8,headDim:128,dtype:'bfloat16',maxCtx:131072,attn:'gqa'},
   'nvidia/Mistral-NeMo-Minitron-8B-Instruct':{params:8,layers:32,kvHeads:8,headDim:128,dtype:'bfloat16',maxCtx:131072,attn:'gqa'},
+  // z.ai GLM 5.2 — MoE (744B total, 8/256 experts active) with MLA (compressed KV cache)
+  'zai-org/GLM-5.2':           {params:744, layers:78, kvHeads:64, headDim:192, dtype:'bfloat16', maxCtx:1048576, attn:'gqa', mla:true, kvLoraRank:512, qkRopeDim:64},
+  'zai-org/GLM-5.2-FP8':       {params:744, layers:78, kvHeads:64, headDim:192, dtype:'fp8',      maxCtx:1048576, attn:'gqa', mla:true, kvLoraRank:512, qkRopeDim:64},
 };
 
 function applyModelConfig(id, cfg) {
   S.hfId = id; S.modelLabel = id.split('/').pop();
   S.numKvHeads = cfg.kvHeads; S.headDim = cfg.headDim; S.numLayers = cfg.layers;
   S.attn = cfg.attn || 'gqa';
+  S.mla = !!cfg.mla; S.kvLoraRank = cfg.kvLoraRank || null; S.qkRopeDim = cfg.qkRopeDim || null;
   if (cfg.params) {
     S.model = cfg.params;
     document.getElementById('s-params').value = Math.min(cfg.params, 405);
@@ -1759,13 +1843,16 @@ function applyModelConfig(id, cfg) {
     info.textContent = id + ' | ' + cfg.params + 'B | Layers: ' + cfg.layers
       + ' | KV heads: ' + cfg.kvHeads + ' | Head dim: ' + cfg.headDim
       + ' | dtype: ' + cfg.dtype + ' | wp: ' + S.wp + ' bytes/param'
+      + (cfg.mla ? ' | MLA (rank=' + cfg.kvLoraRank + ')' : '')
       + (cfg.maxCtx ? ' | max ctx: ' + Math.round(cfg.maxCtx/1000) + 'K' : '');
   }
   var hfst = document.getElementById('hf-st');
   if (hfst) {
     hfst.className = 'hfst ok';
     hfst.textContent = '\u2713 Exact KV loaded ('
-      + cfg.kvHeads + ' KV heads \u00d7 ' + cfg.headDim + ' dim \u00d7 ' + cfg.layers + ' layers)'
+      + (cfg.mla ? 'MLA rank=' + cfg.kvLoraRank + '+' + cfg.qkRopeDim + ' rope'
+        : cfg.kvHeads + ' KV heads \u00d7 ' + cfg.headDim + ' dim')
+      + ' \u00d7 ' + cfg.layers + ' layers)'
       + (S.wp < 2 ? ' \u00b7 ' + cfg.dtype + ' weights (' + S.wp + 'B/param)' : '');
   }
   syncAssumptions();
@@ -1848,6 +1935,7 @@ function fetchHF() {
 
 function onHFInput() {
   S.numKvHeads = null; S.headDim = null; S.numLayers = null; S.hfId = null;
+  S.mla = false; S.kvLoraRank = null; S.qkRopeDim = null;
   document.getElementById('minfo').className = 'minfo';
   document.getElementById('hf-st').textContent = '';
 }
@@ -1897,6 +1985,8 @@ var AC_MODELS = [
   {id:'google/gemma-2-27b-it',                 cat:'other', badge:'hf', params:27},
   {id:'deepseek-ai/DeepSeek-R1-Distill-Llama-8B',  cat:'other', badge:'hf', params:8},
   {id:'deepseek-ai/DeepSeek-R1-Distill-Llama-70B', cat:'other', badge:'hf', params:70},
+  {id:'zai-org/GLM-5.2',     cat:'zai', badge:'hf', params:744},
+  {id:'zai-org/GLM-5.2-FP8', cat:'zai', badge:'hf', params:744, q:'FP8'},
 ];
 var acCat='all', acIdx=-1, acVis=[], acTimer=null;
 
@@ -1990,6 +2080,11 @@ function nP2(n) { var p=1; while(p<n) p*=2; return p; }
 function kvBytesPerToken() {
   // ALWAYS returns GB per K-tokens (consistent unit for both paths)
   var b = S.kv === 1 ? 1 : 2;
+  if (S.mla && S.kvLoraRank && S.qkRopeDim && S.numLayers) {
+    // MLA (Multi-head Latent Attention): joint compressed KV + rope key
+    // Per token per layer = (kvLoraRank + qkRopeDim) elements (NOT doubled — K and V are joint)
+    return S.numLayers * (S.kvLoraRank + S.qkRopeDim) * b * 1000 / 1e9;
+  }
   if (S.numKvHeads && S.headDim && S.numLayers) {
     // exact: bytes/tok → GB/K-tok = bytes * 1000 / 1e9
     return 2 * S.numKvHeads * S.headDim * S.numLayers * b * 1000 / 1e9;
@@ -2000,6 +2095,9 @@ function kvBytesPerToken() {
 
 function kvFP8BytesPerToken() {
   // ALWAYS returns GB per K-tokens
+  if (S.mla && S.kvLoraRank && S.qkRopeDim && S.numLayers) {
+    return S.numLayers * (S.kvLoraRank + S.qkRopeDim) * 1 * 1000 / 1e9;
+  }
   if (S.numKvHeads && S.headDim && S.numLayers) {
     return 2 * S.numKvHeads * S.headDim * S.numLayers * 1 * 1000 / 1e9;
   }
@@ -2338,6 +2436,12 @@ function _renderResult() {
     }
   }
 
+  // API comparison
+  renderApiComparison(r.t4 < r.t1 && r.llmdOk ? r.t4 : r.t1);
+
+  // Agentic workload profile
+  renderAgenticProfile();
+
   // Tiers
   var tl = el('tier-list');
   tl.innerHTML = '';
@@ -2623,6 +2727,196 @@ function aHike(v,e2) {
   renderResult();
 }
 
+// ===== API COMPARISON =====
+var API_MODELS = {
+  'claude-opus-4-8':   {name:'Claude Opus 4.8',   inp:5.00,  out:25.00},
+  'claude-sonnet-4-6': {name:'Claude Sonnet 4.6',  inp:3.00,  out:15.00},
+  'claude-haiku-4-5':  {name:'Claude Haiku 4.5',   inp:1.00,  out:5.00}
+};
+function toggleApi() {
+  S.apiEnabled = !S.apiEnabled;
+  var t = el('api-toggle'); t.classList.toggle('on', S.apiEnabled);
+  el('api-inputs').style.display = S.apiEnabled ? '' : 'none';
+  el('api-workload').style.display = S.apiEnabled ? '' : 'none';
+  renderResult();
+}
+function toggleApiBatch() {
+  S.apiBatch = !S.apiBatch;
+  el('api-batch-toggle').classList.toggle('on', S.apiBatch);
+  renderResult();
+}
+function apiModel(v,e2) {
+  S.apiModel = v;
+  var m = API_MODELS[v];
+  S.apiInputPrice = m.inp; S.apiOutputPrice = m.out;
+  el('s-api-in').value = m.inp; el('v-api-in').textContent = '$' + m.inp.toFixed(2);
+  el('s-api-out').value = m.out; el('v-api-out').textContent = '$' + m.out.toFixed(2);
+  document.querySelectorAll('#api-model-chips .chip').forEach(function(c){c.classList.toggle('on',c.dataset.v===v);});
+  renderResult();
+}
+function apiIn(v) { S.apiInputPrice=v; el('v-api-in').textContent='$'+v.toFixed(2); renderResult(); }
+function apiOut(v) { S.apiOutputPrice=v; el('v-api-out').textContent='$'+v.toFixed(2); renderResult(); }
+function apiCache(v) { S.apiCacheRate=v; el('v-api-cache').textContent=v+'%'; renderResult(); }
+function apiVol(v) { S.apiVolume=v; el('v-api-vol').textContent = v>=1e6?(v/1e6).toFixed(1)+'M':Math.round(v/1000)+'K'; renderResult(); }
+function apiAvgIn(v) { S.apiAvgInput=v; el('v-api-avgin').textContent = v>=1000?Math.round(v/1000)+'K':v; renderResult(); }
+function apiAvgOut(v) { S.apiAvgOutput=v; el('v-api-avgout').textContent = v>=1000?(v/1000).toFixed(1)+'K':v; renderResult(); }
+function apiTput(v) { S.throughput=v; el('v-tput').textContent=v+' tok/s'; renderResult(); }
+
+function calcApiComparison(gpuCount) {
+  var batchMult = S.apiBatch ? 0.5 : 1;
+  var cacheDiscount = S.apiCacheRate / 100 * 0.9; // cache reads are 90% cheaper
+  var effInputPrice = S.apiInputPrice * batchMult * (1 - cacheDiscount);
+  var effOutputPrice = S.apiOutputPrice * batchMult;
+  var apiCostPerReq = (S.apiAvgInput * effInputPrice + S.apiAvgOutput * effOutputPrice) / 1e6;
+  var apiMonthly = S.apiVolume * apiCostPerReq;
+  var apiYearly = apiMonthly * 12;
+  var apiTotal = apiYearly * S.amortYrs;
+
+  var selfMonthlyCloud = gpuCount * S.awsHr * 720;
+  var selfMonthlyOnprem = gpuCount * S.onpremYr / (S.amortYrs * 12);
+  var selfTotalCloud = cloudTotal(gpuCount);
+  var selfTotalOnprem = opTotal(gpuCount);
+
+  var tput = S.throughput || 200;
+  var tokPerMonthSelf = tput * 86400 * 30 * gpuCount;
+  var selfCostPerMtok = selfMonthlyCloud / (tokPerMonthSelf / 1e6);
+
+  return {
+    apiCostPerReq: apiCostPerReq,
+    apiMonthly: apiMonthly,
+    apiTotal: apiTotal,
+    selfMonthlyCloud: selfMonthlyCloud,
+    selfMonthlyOnprem: selfMonthlyOnprem,
+    selfTotalCloud: selfTotalCloud,
+    selfTotalOnprem: selfTotalOnprem,
+    selfCostPerMtok: selfCostPerMtok,
+    effInputPrice: effInputPrice,
+    effOutputPrice: effOutputPrice,
+    savingsMonthly: apiMonthly - selfMonthlyCloud,
+    savingsTotal: apiTotal - selfTotalCloud,
+    savingsPct: apiTotal > 0 ? Math.round((1 - selfTotalCloud / apiTotal) * 100) : 0
+  };
+}
+
+function renderApiComparison(gpuCount) {
+  var wrap = el('api-compare-wrap');
+  if (!S.apiEnabled) { wrap.style.display='none'; return; }
+  wrap.style.display='';
+  var a = calcApiComparison(gpuCount);
+  var yrs = S.amortYrs;
+  var apiName = API_MODELS[S.apiModel] ? API_MODELS[S.apiModel].name : S.apiModel;
+  var selfWins = a.savingsTotal > 0;
+
+  wrap.innerHTML = '\x3cdiv class="api-card">'
+    + '\x3cdiv style="font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:.07em;margin-bottom:12px;text-transform:uppercase">API COST COMPARISON &mdash; ' + yrs + '-YEAR TCO\x3c/div>'
+    + '\x3cdiv class="api-vs">'
+    + '\x3cdiv class="api-side self">'
+    + '\x3cdiv style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:6px">Self-hosted (' + gpuCount + ' ' + S.gpuName + 's)\x3c/div>'
+    + '\x3cdiv class="api-price">' + fmt$(a.selfTotalCloud) + '\x3c/div>'
+    + '\x3cdiv class="api-sub">' + fmt$(a.selfMonthlyCloud) + '/mo cloud\x3c/div>'
+    + '\x3cdiv class="api-sub">' + fmt$(a.selfMonthlyOnprem) + '/mo on-prem\x3c/div>'
+    + '\x3c/div>'
+    + '\x3cdiv class="api-divider">vs\x3c/div>'
+    + '\x3cdiv class="api-side cloud">'
+    + '\x3cdiv style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:6px">' + apiName + ' API\x3c/div>'
+    + '\x3cdiv class="api-price">' + fmt$(a.apiTotal) + '\x3c/div>'
+    + '\x3cdiv class="api-sub">' + fmt$(a.apiMonthly) + '/mo\x3c/div>'
+    + '\x3cdiv class="api-sub">$' + a.effInputPrice.toFixed(2) + '/$' + a.effOutputPrice.toFixed(2) + ' per M tok' + (S.apiBatch?' (batch)':'') + '\x3c/div>'
+    + '\x3c/div>'
+    + '\x3c/div>'
+    + (selfWins
+      ? '\x3cdiv class="api-savings">'
+        + '\x3cdiv class="api-sval">Save ' + fmt$(a.savingsTotal) + ' (' + a.savingsPct + '%) over ' + yrs + ' years\x3c/div>'
+        + '\x3cdiv class="api-slbl">Self-hosted is ' + (a.apiMonthly / Math.max(1,a.selfMonthlyCloud)).toFixed(1) + 'x cheaper per month\x3c/div>'
+        + '\x3c/div>'
+      : '\x3cdiv style="text-align:center;margin-top:12px;padding:8px 12px;background:var(--adim);border:1px solid var(--abord);border-radius:8px">'
+        + '\x3cdiv style="font-family:var(--display);font-size:14px;font-weight:600;color:var(--amber)">API is ' + fmt$(Math.abs(a.savingsTotal)) + ' cheaper over ' + yrs + ' years\x3c/div>'
+        + '\x3cdiv style="font-family:var(--mono);font-size:10px;color:var(--amber)">Self-hosted becomes cheaper at higher volume\x3c/div>'
+        + '\x3c/div>')
+    + '\x3cdiv class="api-sov">\x3csvg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"\x3e\x3crect x="3" y="11" width="18" height="11" rx="2"/\x3e\x3cpath d="M7 11V7a5 5 0 0110 0v4"/\x3e\x3c/svg\x3e Data sovereignty: self-hosted keeps all data on your GPUs\x3c/div>'
+    + '\x3cdiv class="api-note">'
+    + 'API pricing: ' + apiName + ' at $' + S.apiInputPrice.toFixed(2) + '/$' + S.apiOutputPrice.toFixed(2) + ' per M tokens (in/out)'
+    + (S.apiBatch ? ' with 50% batch discount' : '')
+    + (S.apiCacheRate > 0 ? ', ' + S.apiCacheRate + '% prompt cache hit rate' : '')
+    + '. Workload: ' + (S.apiVolume>=1e6?(S.apiVolume/1e6).toFixed(1)+'M':Math.round(S.apiVolume/1000)+'K') + ' req/mo'
+    + ', ' + Math.round(S.apiAvgInput/1000) + 'K in / ' + (S.apiAvgOutput/1000).toFixed(1) + 'K out per request.'
+    + '\x3c/div>'
+    + '\x3c/div>';
+}
+
+// ===== AGENTIC WORKLOAD =====
+function toggleAgentic() {
+  S.agEnabled = !S.agEnabled;
+  el('agentic-toggle').classList.toggle('on', S.agEnabled);
+  el('agentic-inputs').style.display = S.agEnabled ? '' : 'none';
+  renderResult();
+}
+function agTurns(v) { S.agTurns=v; el('v-ag-turns').textContent=v; renderResult(); }
+function agTools(v) { S.agTools=v; el('v-ag-tools').textContent=v; renderResult(); }
+function agSys(v) { S.agSysPrompt=v; el('v-ag-sys').textContent=(v/1000).toFixed(1)+'K'; renderResult(); }
+function agGrowth(v) { S.agGrowth=v; el('v-ag-growth').textContent=(v/1000).toFixed(1)+'K'; renderResult(); }
+function agOut(v) { S.agOutput=v; el('v-ag-out').textContent=(v/1000).toFixed(1)+'K'; renderResult(); }
+
+function calcAgenticProfile() {
+  var turns = S.agTurns;
+  var sysTokens = S.agSysPrompt;
+  var growthPerTurn = S.agGrowth;
+  var outputPerTurn = S.agOutput;
+  var toolsPerTurn = S.agTools;
+
+  var totalInput = 0, totalOutput = 0, peakCtx = 0;
+  for (var t = 0; t < turns; t++) {
+    var turnCtx = sysTokens + t * growthPerTurn;
+    totalInput += turnCtx;
+    totalOutput += outputPerTurn;
+    if (turnCtx > peakCtx) peakCtx = turnCtx;
+  }
+
+  var totalTokens = totalInput + totalOutput;
+  var avgInputPerTurn = Math.round(totalInput / turns);
+  var cacheBenefit = sysTokens / (avgInputPerTurn || 1);
+
+  return {
+    turns: turns,
+    toolsPerTurn: toolsPerTurn,
+    totalToolCalls: turns * toolsPerTurn,
+    totalInput: totalInput,
+    totalOutput: totalOutput,
+    totalTokens: totalTokens,
+    peakCtxK: Math.round(peakCtx / 1000),
+    avgInputPerTurn: avgInputPerTurn,
+    cacheBenefit: Math.round(cacheBenefit * 100),
+    sysTokens: sysTokens
+  };
+}
+
+function renderAgenticProfile() {
+  var wrap = el('agentic-profile-wrap');
+  if (!S.agEnabled) { wrap.style.display='none'; return; }
+  wrap.style.display='';
+  var a = calcAgenticProfile();
+
+  wrap.innerHTML = '\x3cdiv class="api-card">'
+    + '\x3cdiv style="font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:.07em;margin-bottom:12px;text-transform:uppercase">AGENTIC SESSION PROFILE\x3c/div>'
+    + '\x3cdiv class="kvm" style="margin-bottom:12px">'
+    + '\x3cdiv class="kvc">\x3cdiv class="kvlbl">TURNS\x3c/div>\x3cdiv class="kvval">' + a.turns + '\x3c/div>'
+    + '\x3cdiv class="kvsub">' + a.toolsPerTurn + ' tool calls/turn\x3c/div>\x3c/div>'
+    + '\x3cdiv class="kvc">\x3cdiv class="kvlbl">PEAK CONTEXT\x3c/div>\x3cdiv class="kvval">' + a.peakCtxK + 'K\x3c/div>'
+    + '\x3cdiv class="kvsub">tokens at final turn\x3c/div>\x3c/div>'
+    + '\x3cdiv class="kvc">\x3cdiv class="kvlbl">TOTAL TOKENS\x3c/div>\x3cdiv class="kvval">' + (a.totalTokens>=1e6?(a.totalTokens/1e6).toFixed(1)+'M':Math.round(a.totalTokens/1000)+'K') + '\x3c/div>'
+    + '\x3cdiv class="kvsub">' + Math.round(a.totalInput/1000) + 'K in / ' + Math.round(a.totalOutput/1000) + 'K out\x3c/div>\x3c/div>'
+    + '\x3cdiv class="kvc">\x3cdiv class="kvlbl">CACHE BENEFIT\x3c/div>\x3cdiv class="kvval">' + a.cacheBenefit + '%\x3c/div>'
+    + '\x3cdiv class="kvsub">system prompt reuse\x3c/div>\x3c/div>'
+    + '\x3c/div>'
+    + '\x3cdiv class="api-note">'
+    + 'Session: ' + a.turns + ' turns &times; ' + a.toolsPerTurn + ' tool calls = ' + a.totalToolCalls + ' total tool calls. '
+    + 'System prompt (' + (a.sysTokens/1000).toFixed(1) + 'K tokens) cached across turns. '
+    + 'Context grows ' + (S.agGrowth/1000).toFixed(1) + 'K tokens/turn from tool outputs. '
+    + 'Peak context at turn ' + a.turns + ': ' + a.peakCtxK + 'K tokens.'
+    + '\x3c/div>'
+    + '\x3c/div>';
+}
+
 // ===== UI =====
 function toggleTheme() {
   isDark = !isDark;
@@ -2636,7 +2930,6 @@ function toggleTheme() {
 function tog(k) {
   ADMIN[k] = !ADMIN[k];
   el('t-' + k).classList.toggle('on', ADMIN[k]);
-  if (k === 'linkedin') { el('liwrap').classList.toggle('h', !ADMIN[k] || liDismissed); return; }
   if (el('rp-results').style.display !== 'none') renderResult();
 }
 function switchPage(id, elem) {
@@ -3262,7 +3555,7 @@ function buildTechPrompt(raw) {
   +'1. Is the KV formula structurally correct as a planning estimate?\n'
   +'2. Is TP='+raw.tpMin+' a reasonable choice for '+raw.users+' users at this scale?\n'
   +'3. Is the final order-of-magnitude ('+raw.t1+' GPUs) reasonable for production planning?\n'
-  +'4. What single assumption poses the highest real-world risk?\n'+'\n\n— gpu.calc · linkedin.com/in/vgrover1515 · huggingface.co/vikasgrover2004';
+  +'4. What single assumption poses the highest real-world risk?\n'+'\n\n— gpu.calc';
 }
 
 function buildCFOPrompt(raw) {
@@ -3281,7 +3574,7 @@ function buildCFOPrompt(raw) {
   +'- On-prem: '+raw.opTot+' hardware ('+raw.yrs+'-year amortisation)\n'
   +'- Cloud on-demand: '+raw.clTot+' over '+raw.yrs+' years (+3%/yr)\n\n'
   +'QUESTION: Is '+raw.t1+' GPUs a defensible budget planning number for this workload,\n'
-  +'or are we materially over/under-provisioned? Give a one-paragraph verdict.\n'+'\n\n— gpu.calc · linkedin.com/in/vgrover1515 · huggingface.co/vikasgrover2004';
+  +'or are we materially over/under-provisioned? Give a one-paragraph verdict.\n'+'\n\n— gpu.calc';
 }
 
 function getRawForValidate() {

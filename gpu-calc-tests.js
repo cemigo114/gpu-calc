@@ -61,7 +61,12 @@ function test(name, fn) {
   S.model=8; S.wp=2; S.kv=2; S.gpu=80; S.gpuName='H100';
   S.ctx=8; S.users=100; S.overhead=8; S.attn='gqa';
   S.numKvHeads=null; S.headDim=null; S.numLayers=null; S.hfId=null;
+  S.mla=false; S.kvLoraRank=null; S.qkRopeDim=null;
   S.hitrate=0.1; S.onpremYr=25000; S.awsHr=3.10; S.amortYrs=5; S.cloudHike=3;
+  S.apiEnabled=false; S.apiModel='claude-opus-4-8'; S.apiInputPrice=5.00; S.apiOutputPrice=25.00;
+  S.apiBatch=false; S.apiCacheRate=0; S.apiVolume=1000000; S.apiAvgInput=15000; S.apiAvgOutput=2000;
+  S.throughput=200;
+  S.agEnabled=false; S.agTurns=10; S.agTools=5; S.agSysPrompt=5000; S.agGrowth=2000; S.agOutput=1000;
   try {
     fn();
     passed++;
@@ -598,6 +603,145 @@ test('kvBpt numerically equals MB/tok', function() {
   var mbTok = r.kvBpt; // this IS MB/tok
   assertApprox(mbTok, 2*8*128*32*2*1000/1e9, 1, 'kvBpt = MB/tok');
   assert(mbTok < 10, 'MB/tok < 10 for 8B (not thousands)');
+});
+
+// ── SECTION: MLA (Multi-head Latent Attention) ──────────────────────────────
+section('MLA — GLM 5.2 compressed KV cache');
+
+test('kvBytesPerToken: MLA compressed KV (BF16)', function() {
+  S.mla=true; S.kvLoraRank=512; S.qkRopeDim=64; S.numLayers=78; S.kv=2;
+  S.numKvHeads=64; S.headDim=192;
+  // MLA: layers * (kvLoraRank + qkRopeDim) * bytes * 1000 / 1e9
+  // = 78 * 576 * 2 * 1000 / 1e9 = 0.089856
+  assertApprox(kvBytesPerToken(), 0.0899, 1, 'MLA BF16 KV');
+});
+
+test('kvBytesPerToken: MLA compressed KV (FP8)', function() {
+  S.mla=true; S.kvLoraRank=512; S.qkRopeDim=64; S.numLayers=78; S.kv=1;
+  S.numKvHeads=64; S.headDim=192;
+  // = 78 * 576 * 1 * 1000 / 1e9 = 0.044928
+  assertApprox(kvBytesPerToken(), 0.0449, 1, 'MLA FP8 KV');
+});
+
+test('kvBytesPerToken: MLA is much smaller than standard GQA', function() {
+  S.mla=true; S.kvLoraRank=512; S.qkRopeDim=64; S.numLayers=78; S.kv=2;
+  S.numKvHeads=64; S.headDim=192;
+  var mlaKv = kvBytesPerToken();
+
+  S.mla=false; S.kvLoraRank=null; S.qkRopeDim=null;
+  var stdKv = kvBytesPerToken();
+
+  assert(stdKv / mlaKv > 30, 'MLA should be >30x smaller than standard (' + (stdKv/mlaKv).toFixed(1) + 'x)');
+});
+
+test('kvFP8BytesPerToken: MLA path', function() {
+  S.mla=true; S.kvLoraRank=512; S.qkRopeDim=64; S.numLayers=78;
+  S.numKvHeads=64; S.headDim=192;
+  assertApprox(kvFP8BytesPerToken(), 0.0449, 1, 'MLA FP8 exact');
+});
+
+test('GLM 5.2 FP8 on 8xH200: weights + KV fit', function() {
+  applyModelConfig('zai-org/GLM-5.2-FP8', MODEL_CONFIGS['zai-org/GLM-5.2-FP8']);
+  S.gpu=141; S.gpuName='H200'; S.ctx=8; S.users=100; S.overhead=8;
+  var r = calcTiers();
+  assert(r.wt === 744, 'GLM 5.2 FP8 = 744 GB weights, got ' + r.wt);
+  assert(r.tpMin === 8, 'Should need TP=8 for 744GB on H200 141GB, got ' + r.tpMin);
+  assert(r.t1 >= 8, 'Should need at least 8 GPUs, got ' + r.t1);
+});
+
+test('MLA fields reset on model switch', function() {
+  S.mla=true; S.kvLoraRank=512; S.qkRopeDim=64;
+  onHFInput();
+  assert(!S.mla, 'mla should reset to false');
+  assert(S.kvLoraRank === null, 'kvLoraRank should reset');
+  assert(S.qkRopeDim === null, 'qkRopeDim should reset');
+});
+
+// ── SECTION: API COST COMPARISON ────────────────────────────────────────────
+section('API Cost Comparison');
+
+test('calcApiComparison: basic Claude Opus pricing', function() {
+  S.apiEnabled=true; S.apiModel='claude-opus-4-8';
+  S.apiInputPrice=5.00; S.apiOutputPrice=25.00;
+  S.apiBatch=false; S.apiCacheRate=0;
+  S.apiVolume=1000000; S.apiAvgInput=15000; S.apiAvgOutput=2000;
+  S.throughput=200; S.awsHr=4.20; S.amortYrs=5; S.cloudHike=3;
+
+  var a = calcApiComparison(8);
+  // API cost per req: (15000 * 5 + 2000 * 25) / 1e6 = 0.125
+  assertApprox(a.apiCostPerReq, 0.125, 1, 'API cost per request');
+  // Monthly: 1M * 0.125 = $125,000
+  assertApprox(a.apiMonthly, 125000, 1, 'API monthly cost');
+});
+
+test('calcApiComparison: batch discount halves cost', function() {
+  S.apiEnabled=true; S.apiInputPrice=5.00; S.apiOutputPrice=25.00;
+  S.apiBatch=true; S.apiCacheRate=0;
+  S.apiVolume=1000000; S.apiAvgInput=10000; S.apiAvgOutput=2000;
+
+  var a = calcApiComparison(8);
+  // Batch: (10000*2.5 + 2000*12.5) / 1e6 = 0.05
+  assertApprox(a.apiCostPerReq, 0.05, 1, 'Batch API cost per request');
+});
+
+test('calcApiComparison: cache reduces input cost', function() {
+  S.apiEnabled=true; S.apiInputPrice=5.00; S.apiOutputPrice=25.00;
+  S.apiBatch=false; S.apiCacheRate=50; // 50% cache hit rate
+  S.apiVolume=1000000; S.apiAvgInput=10000; S.apiAvgOutput=2000;
+
+  var a = calcApiComparison(8);
+  // Effective input: 5 * (1 - 0.5*0.9) = 5 * 0.55 = 2.75
+  assertApprox(a.effInputPrice, 2.75, 1, 'Effective input price with cache');
+});
+
+test('calcApiComparison: self-hosted cheaper at high volume', function() {
+  S.apiEnabled=true; S.apiInputPrice=5.00; S.apiOutputPrice=25.00;
+  S.apiBatch=false; S.apiCacheRate=0;
+  S.apiVolume=5000000; S.apiAvgInput=15000; S.apiAvgOutput=2000;
+  S.awsHr=4.20; S.amortYrs=5; S.throughput=200;
+
+  var a = calcApiComparison(8);
+  assert(a.savingsTotal > 0, 'Self-hosted should be cheaper at 5M req/mo');
+  assert(a.savingsPct > 0, 'Savings pct should be positive');
+});
+
+// ── SECTION: AGENTIC WORKLOAD ────────────────────────────────────────────────
+section('Agentic Workload Profile');
+
+test('calcAgenticProfile: basic session math', function() {
+  S.agEnabled=true; S.agTurns=10; S.agTools=5;
+  S.agSysPrompt=5000; S.agGrowth=2000; S.agOutput=1000;
+  var a = calcAgenticProfile();
+  assertEq(a.turns, 10, 'turns');
+  assertEq(a.totalToolCalls, 50, 'total tool calls = 10*5');
+  assertEq(a.totalOutput, 10000, 'total output = 10*1000');
+  assert(a.peakCtxK > 0, 'peak context should be positive');
+});
+
+test('calcAgenticProfile: peak context grows with turns', function() {
+  S.agEnabled=true; S.agSysPrompt=5000; S.agGrowth=2000;
+  S.agTurns=5; S.agOutput=1000; S.agTools=3;
+  var a5 = calcAgenticProfile();
+  S.agTurns=20;
+  var a20 = calcAgenticProfile();
+  assert(a20.peakCtxK > a5.peakCtxK, 'more turns = higher peak context');
+  assert(a20.totalTokens > a5.totalTokens, 'more turns = more total tokens');
+});
+
+test('calcAgenticProfile: cache benefit from system prompt', function() {
+  S.agEnabled=true; S.agTurns=10; S.agTools=5;
+  S.agSysPrompt=10000; S.agGrowth=1000; S.agOutput=500;
+  var a = calcAgenticProfile();
+  assert(a.cacheBenefit > 50, 'high system prompt relative to growth = high cache benefit (' + a.cacheBenefit + '%)');
+});
+
+test('calcAgenticProfile: single turn is valid', function() {
+  S.agEnabled=true; S.agTurns=1; S.agTools=0;
+  S.agSysPrompt=5000; S.agGrowth=0; S.agOutput=500;
+  var a = calcAgenticProfile();
+  assertEq(a.totalInput, 5000, 'single turn input = system prompt');
+  assertEq(a.totalOutput, 500, 'single turn output');
+  assertEq(a.peakCtxK, 5, 'peak = 5K');
 });
 
 // ── SUMMARY ───────────────────────────────────────────────────────────────────
